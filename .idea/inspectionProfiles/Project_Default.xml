@@ -1,0 +1,13 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="NonSerializableFieldInSerializableClass" enabled="false" level="ERROR" enabled_by_default="false" editorAttributes="ERRORS_ATTRIBUTES">
+      <option name="ignorableAnnotations">
+        <value />
+      </option>
+      <option name="ignoreAnonymousInnerClasses" value="false" />
+      <option name="superClassString" value="java.awt.Component" />
+    </inspection_tool>
+    <inspection_tool class="NonSerializableWithSerialVersionUIDField" enabled="false" level="ERROR" enabled_by_default="false" editorAttributes="ERRORS_ATTRIBUTES" />
+  </profile>
+</component>
