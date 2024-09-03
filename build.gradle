@@ -38,6 +38,7 @@ intellij {
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
+    // 编译参数
     options.compilerArgs += ['-Xlint:unchecked', '-Xlint:deprecation', '-parameters']
     // jdk 版本
     options.release.set(17)
