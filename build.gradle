@@ -1,8 +1,8 @@
-// 这两个插件是必备
+// 插件依赖
 plugins {
     id 'java'
     id 'org.jetbrains.intellij' version '1.16.1'
-    id 'org.jetbrains.kotlin.jvm' version '1.9.21'
+//    id 'org.jetbrains.kotlin.jvm' version '1.9.21'
 }
 
 // 项目信息
@@ -18,39 +18,42 @@ repositories {
     maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
 }
 
-// 依赖
+// 项目依赖
 dependencies {
     compileOnly 'org.projectlombok:lombok:1.18.2'
-    annotationProcessor 'org.projectlombok:lombok:1.18.2'
+// https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
+    implementation 'org.apache.commons:commons-lang3:3.17.0'
+
+
 }
 
 // 配置intellij插件
 intellij {
     // 调试使用的版本
     version = '2023.1.5'
-    type = 'IU' // IC 社区版 IU 企业版
+    type = 'IC' // IC 社区版 IU 企业版
+    // 插件依赖
     plugins = ['com.intellij.java', 'com.intellij.java-i18n']
 
     // 不更新untilBuild
     updateSinceUntilBuild = false
     downloadSources = true
 }
-
+// 编译参数
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
     // 编译参数
     options.compilerArgs += ['-Xlint:unchecked', '-Xlint:deprecation', '-parameters']
-    // jdk 版本
-    options.release.set(17)
-    sourceCompatibility = 17
-    targetCompatibility = 17
-
-
+    // 编译线程是否新开一个线程
+    options.fork = false
+    // 增量编译
+    options.incremental = true
 }
 
 // 插件适用版本
 patchPluginXml {
     //注意这个版本号不能高于上面intellij的version,否则runIde会报错
-    sinceBuild = '222'
+    sinceBuild = '231'
     untilBuild = '241.*'
 }
+

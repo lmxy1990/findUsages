@@ -4,15 +4,16 @@
     <id>com.pan.io.find-usages</id>
 
     <!--   插件名-->
-    <name>Find-usages</name>
+    <name>Find-Usages</name>
 
     <!--   作者个人信息-->
     <vendor email="lmxy1990@foxmail.com" url="https://lmxy1990.github.io/">个人开发者</vendor>
 
     <!--    插件描述-->
     <description><![CDATA[
-    Enter short description for your plugin here.<br>
-    <em>most HTML tags may be used</em>
+      <p>
+       插件功能：查找文件引用，支持文件、文件夹、文件类型、文件后缀、文件名、文件路径、文件内容、文件行、文件行内容、文件行正则、文件行行号、文件行行号
+      </p>
   ]]></description>
 
     <!-- 产品和插件兼容性要求-->
@@ -22,4 +23,31 @@
     <extensions defaultExtensionNs="com.intellij">
 
     </extensions>
+
+    <actions>
+        <!--查找引用-->
+        <action id="FilterFindUsagesAction"
+                class="com.pan.io.findusages.action.FilterFindUsagesAction" text="FilterFindUsagesAction"
+                description="FilterFindUsagesAction">
+            <add-to-group group-id="FindUsagesMenuGroup" anchor="after" relative-to-action="UsageView.ShowRecentFindUsages"/>
+            <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt 9"/>
+        </action>
+        <!-- 设置-->
+        <action id="FilterShowSettingsAndFindUsages"
+                class="com.pan.io.findusages.action.FilterShowSettingsAndFindUsages"
+                text="FilterShowSettingsAndFindUsages"
+                description="FilterShowSettingsAndFindUsages">
+            <add-to-group group-id="FindUsagesMenuGroup" anchor="after" relative-to-action="FilterFindUsagesAction"/>
+        </action>
+        <!-- 查看引用-->
+        <action id="FilterShowUsagesAction"
+                class="com.pan.io.findusages.action.FilterShowUsagesAction"
+                text="FilterShowUsagesAction"
+                description="FilterShowUsagesAction">
+            <add-to-group group-id="FindUsagesMenuGroup" anchor="after"
+                          relative-to-action="FilterShowSettingsAndFindUsages"/>
+        </action>
+
+
+    </actions>
 </idea-plugin>
