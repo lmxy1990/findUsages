@@ -5,4 +5,4 @@
 //    }
 //}
 
-rootProject.name = "find-usages"
+rootProject.name = "filter-find-usages"
