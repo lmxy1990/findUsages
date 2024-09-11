@@ -18,11 +18,14 @@ import com.pan.io.findusages.config.FilterConfig;
 import com.pan.io.findusages.data.UsageCall;
 import com.pan.io.findusages.data.UsageCallerData;
 import com.pan.io.findusages.data.UsageCallerNode;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 public class FilterFindUsageManager {
 
@@ -55,9 +58,8 @@ public class FilterFindUsageManager {
         AbstractFindUsagesDialog dialog = handler.getFindUsagesDialog(false, shouldOpenInNewTab(element.getProject()), mustOpenInNewTab(element.getProject()));
         FindUsagesOptions findUsagesOptions = dialog.calcFindUsagesOptions();
 
-        // 找出第一级引用
-        Query<PsiReference> search = ReferencesSearch.search(psiMethod, findUsagesOptions.searchScope, false);
-        Collection<PsiReference> psiReferences = search.findAll();
+        List<PsiReference> psiReferences = new ArrayList<>();
+        extraCall(psiMethod, findUsagesOptions, psiReferences);
         if (psiReferences.isEmpty()) {
             //终点，说明没有赋值的地方
             return;
@@ -78,9 +80,51 @@ public class FilterFindUsageManager {
             if (psiCall == null) {
                 continue;
             }
-            handleCaller(project, psiCall, call, usageCallerData, myAnnotation, callerNode);
+            handleCaller(project, findUsagesOptions, psiCall, call, usageCallerData, myAnnotation, callerNode);
         }
     }
+
+    private static void extraCall(PsiMethod psiMethod, FindUsagesOptions findUsagesOptions, Collection<PsiReference> psiReferences) {
+        List<PsiMethod> methodList = findInterMethods(psiMethod);
+
+        if (CollectionUtils.isEmpty(methodList)) {
+            return;
+        }
+        for (PsiMethod method : methodList) {
+            Query<PsiReference> search1 = ReferencesSearch.search(method, findUsagesOptions.searchScope, false);
+            Collection<PsiReference> psiReferences1 = search1.findAll();
+            if (CollectionUtils.isEmpty(psiReferences1)) {
+                continue;
+            }
+            psiReferences.addAll(psiReferences1);
+        }
+    }
+
+    /**
+     * 方法的接口调用的，也需要查找
+     *
+     * @param psiMethod
+     * @return
+     */
+    public static List<PsiMethod> findInterMethods(PsiMethod psiMethod) {
+        PsiClass containingClass = psiMethod.getContainingClass();
+        if (containingClass == null) {
+            return null;
+        }
+        PsiMethod[] methods = containingClass.findMethodsByName(psiMethod.getName(), true);
+        if (methods.length == 0) {
+            return null;
+        }
+        List<PsiMethod> result = new ArrayList<>(methods.length);
+        for (PsiMethod method : methods) {
+            if (method.getSignature(PsiSubstitutor.EMPTY).equals(psiMethod.getSignature(PsiSubstitutor.EMPTY))) {
+                result.add(method);
+            }
+        }
+
+        return result;
+    }
+
 
     private static boolean shouldOpenInNewTab(Project myProject) {
         return mustOpenInNewTab(myProject) || FindSettings.getInstance().isShowResultsInSeparateView();
@@ -103,7 +147,7 @@ public class FilterFindUsageManager {
         return annotationList.toString();
     }
 
-    private static void handleCaller(Project project, PsiCall psiCall, UsageCall parentCall, UsageCallerData usageCallerData, String nextAnnotations, UsageCallerNode callerNode) {
+    private static void handleCaller(Project project, FindUsagesOptions findUsagesOptions, PsiCall psiCall, UsageCall parentCall, UsageCallerData usageCallerData, String nextAnnotations, UsageCallerNode callerNode) {
         if (usageCallerData.isContainCall(psiCall)) {
             return;
         }
@@ -133,8 +177,9 @@ public class FilterFindUsageManager {
         callerNode.addNextNode(nextCallerNode);
 
         // 递归查找调用
-        Query<PsiReference> search = ReferencesSearch.search(callerMethod, GlobalSearchScope.projectScope(project), false);
-        Collection<PsiReference> psiReferences = search.findAll();
+        List<PsiReference> psiReferences = new ArrayList<>();
+        extraCall(callerMethod, findUsagesOptions, psiReferences);
+
         if (psiReferences.isEmpty()) {
             return;
         }
@@ -144,7 +189,7 @@ public class FilterFindUsageManager {
             if (nextCall == null) {
                 continue;
             }
-            handleCaller(project, nextCall, call, usageCallerData, nextAnnotations, nextCallerNode);
+            handleCaller(project, findUsagesOptions, nextCall, call, usageCallerData, nextAnnotations, nextCallerNode);
         }
     }
 
