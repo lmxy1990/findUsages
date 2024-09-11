@@ -21,22 +21,17 @@ repositories {
 // 项目依赖
 dependencies {
     compileOnly 'org.projectlombok:lombok:1.18.2'
-// https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
     implementation 'org.apache.commons:commons-lang3:3.17.0'
-// https://mvnrepository.com/artifact/org.javassist/javassist
     implementation 'org.javassist:javassist:3.30.2-GA'
-
-
 }
 
-// 配置intellij插件
+// sdk
 intellij {
     // 调试使用的版本
     version = '2023.1.5'
     type = 'IC' // IC 社区版 IU 企业版
     // 插件依赖
     plugins = ['com.intellij.java', 'com.intellij.java-i18n']
-
     // 不更新untilBuild
     updateSinceUntilBuild = false
     downloadSources = true
