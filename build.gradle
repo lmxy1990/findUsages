@@ -23,6 +23,8 @@ dependencies {
     compileOnly 'org.projectlombok:lombok:1.18.2'
 // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
     implementation 'org.apache.commons:commons-lang3:3.17.0'
+// https://mvnrepository.com/artifact/org.javassist/javassist
+    implementation 'org.javassist:javassist:3.30.2-GA'
 
 
 }

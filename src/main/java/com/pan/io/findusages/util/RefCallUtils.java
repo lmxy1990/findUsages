@@ -14,7 +14,7 @@ public class RefCallUtils {
                 continue;
             }
             Class<?>[] paramTypes = method.getParameterTypes();
-            if (paramTypes.length != args.length) {
+            if (args == null ? paramTypes.length != 0 : paramTypes.length != args.length) {
                 continue;
             }
             // check param types
@@ -26,7 +26,7 @@ public class RefCallUtils {
                 method.setAccessible(true);
                 return method.invoke(null, args);
             } catch (Exception e) {
-                e.printStackTrace();
+                throw new RuntimeException(e);
             }
         }
         return null;
@@ -43,10 +43,28 @@ public class RefCallUtils {
         return true;
     }
 
-    public static void main(String[] args) {
-
-
+    public static Object invokeMethod(Object obj, String methodName, Object... args) {
+        Method[] methods = obj.getClass().getDeclaredMethods();
+        for (Method method : methods) {
+            if (!Objects.equals(method.getName(), methodName)) {
+                continue;
+            }
+            Class<?>[] paramTypes = method.getParameterTypes();
+            if (args == null ? paramTypes.length != 0 : paramTypes.length != args.length) {
+                continue;
+            }
+            // check param types
+            boolean match = checkParamTypes(args, paramTypes);
+            if (!match) {
+                continue;
+            }
+            try {
+                method.setAccessible(true);
+                return method.invoke(obj, args);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return null;
     }
-
-
 }

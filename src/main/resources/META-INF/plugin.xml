@@ -18,36 +18,40 @@
 
     <!-- 产品和插件兼容性要求-->
     <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.java</depends>
 
     <!-- 插件定义的扩展点-->
     <extensions defaultExtensionNs="com.intellij">
+        <!--编辑时候提示弹出-->
+        <intentionAction>
+            <language>JAVA</language>
+            <className>com.pan.io.findusages.action.FindUsageIntentionAction</className>
+        </intentionAction>
 
+        <projectService serviceInterface="com.pan.io.findusages.service.SettingsFilterService"
+                        serviceImplementation="com.pan.io.findusages.service.SettingsFilterServiceImpl"/>
+        <!--设置 配置页面-->
+        <!--        <applicationConfigurable dynamic="true" instance="com.pan.io.findusages.ui.FilterConfigForm"-->
+        <!--                                 displayName="FilterFind"/>-->
     </extensions>
 
+
     <actions>
-        <!--查找引用-->
-        <action id="FilterFindUsagesAction"
-                class="com.pan.io.findusages.action.FilterFindUsagesAction" text="FilterFindUsagesAction"
-                description="FilterFindUsagesAction">
-            <add-to-group group-id="FindUsagesMenuGroup" anchor="after" relative-to-action="UsageView.ShowRecentFindUsages"/>
-            <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt 9"/>
+        <!-- 快速查找-->
+        <action id="FilterFindUsages"
+                class="com.pan.io.findusages.action.FilterFindUsagesAction"
+                text="FilterFindUsages"
+                description="FilterFindUsages">
+            <add-to-group group-id="FindUsagesMenuGroup" anchor="after"
+                          relative-to-action="UsageView.ShowRecentFindUsages"/>
+            <keyboard-shortcut first-keystroke="ctrl alt 9" keymap="$default"/>
         </action>
         <!-- 设置-->
-        <action id="FilterShowSettingsAndFindUsages"
-                class="com.pan.io.findusages.action.FilterShowSettingsAndFindUsages"
-                text="FilterShowSettingsAndFindUsages"
-                description="FilterShowSettingsAndFindUsages">
-            <add-to-group group-id="FindUsagesMenuGroup" anchor="after" relative-to-action="FilterFindUsagesAction"/>
-        </action>
-        <!-- 查看引用-->
-        <action id="FilterShowUsagesAction"
-                class="com.pan.io.findusages.action.FilterShowUsagesAction"
-                text="FilterShowUsagesAction"
-                description="FilterShowUsagesAction">
+        <action id="FilterFindUsagesSettings" class="com.pan.io.findusages.action.FilterFindUsagesSettingsAction"
+                text="FilterFindUsagesSettings"
+                description="FilterFindUsagesSettings">
             <add-to-group group-id="FindUsagesMenuGroup" anchor="after"
-                          relative-to-action="FilterShowSettingsAndFindUsages"/>
+                          relative-to-action="FilterFindUsages"/>
         </action>
-
-
     </actions>
 </idea-plugin>
