@@ -91,12 +91,12 @@ public class FilterFindUsageManager {
             return;
         }
         for (PsiMethod method : methodList) {
-            Query<PsiReference> search1 = ReferencesSearch.search(method, findUsagesOptions.searchScope, false);
-            Collection<PsiReference> psiReferences1 = search1.findAll();
-            if (CollectionUtils.isEmpty(psiReferences1)) {
+            Query<PsiReference> searchTmp = ReferencesSearch.search(method, findUsagesOptions.searchScope, false);
+            Collection<PsiReference> refTmp = searchTmp.findAll();
+            if (CollectionUtils.isEmpty(refTmp)) {
                 continue;
             }
-            psiReferences.addAll(psiReferences1);
+            psiReferences.addAll(refTmp);
         }
     }
 
