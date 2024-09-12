@@ -1,17 +1,27 @@
 package com.pan.io.findusages.data;
 
 import com.intellij.find.findUsages.PsiElement2UsageTargetAdapter;
+import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiCall;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
 import com.intellij.usageView.UsageInfo;
 import com.intellij.usages.*;
+import com.mxgraph.model.mxCell;
+import com.mxgraph.swing.handler.mxGraphTransferHandler;
+import com.mxgraph.swing.mxGraphComponent;
+import com.mxgraph.view.mxGraph;
 import com.pan.io.findusages.action.FilterFindUsageManager;
 import com.pan.io.findusages.config.FilterConfig;
 import com.pan.io.findusages.service.SettingsFilterService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -118,7 +128,7 @@ public class UsageCallerData {
         UsageViewPresentation usageViewPresentation = new UsageViewPresentation();
         usageViewPresentation.setTargetsNodeText("Filter Find Usage");
         usageViewPresentation.setCodeUsagesString("Find Result Filter With [" + filterConfig.getFilterAnnotation() + " ]");
-        usageViewPresentation.setTabText("Find Usage Plus");
+        usageViewPresentation.setTabText("Filter Find Usage");
         // 对象转换
         UsageTarget[] usageTargets = {new PsiElement2UsageTargetAdapter(element, true)};
 
@@ -148,7 +158,160 @@ public class UsageCallerData {
             assert usageViewManager != null;
             usageViewManager.showUsages(usageTargets, usages, usageViewPresentation);
         }
+
+        drawGraph();
     }
 
+    static final int width = 80;
+    static final int height = 30;
+    static final int xMove = 200;
+    static final int yMove = 60;
+
+    public boolean drawNode(final FilterConfig filterConfig, List<MxCell> allCells, mxGraph graph, Object rootNode, mxCell parent, UsageCallerNode node, final int x, final int y) {
+        // filter
+        boolean available = FilterFindUsageManager.isAvailable(node.getCall().getMyAnnotation(), node.getCall().getAnnotationList(), filterConfig);
+        int xm = available ? x + xMove : x;
+
+        PsiElement caller = node.getCall().getCaller();
+        PsiElement callMethod = node.getCall().getCallMethod();
+
+        MxCell mxCell = new MxCell(callMethod);
+
+        // 连线
+        MxCell lineCell = new MxCell(caller);
+        mxCell nodeCell = (mxCell) graph.createVertex(rootNode, callMethod.getText(), mxCell, xm, y, width, height, null, false);
+        if (available) {
+            graph.addCell(nodeCell);
+
+            if (allCells.contains(mxCell)) {
+                nodeCell.setStyle("fillColor=yellow;");
+            }
+            graph.insertEdge(rootNode, caller.getText(), lineCell, parent, nodeCell, "edgeStyle=elbowEdgeStyle");
+        }
+        allCells.add(lineCell);
+        allCells.add(mxCell);
+
+        // 跳过中间调用节点
+        if (!available) {
+            nodeCell = parent;
+        }
+        List<UsageCallerNode> nodes = node.getNextNodes();
+        if (CollectionUtils.isEmpty(nodes)) {
+            return available;
+        }
+        int ym = y;
+        for (UsageCallerNode nextNode : nodes) {
+            boolean drawn = drawNode(filterConfig, allCells, graph, rootNode, nodeCell, nextNode, xm, ym);
+            if (drawn) {
+                ym += yMove;
+            }
+        }
+        return available;
+    }
+
+    private static final JFrame frame = new JFrame("Call Tree");
+
+    static {
+        // 创建调用链路图
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.setMinimumSize(new Dimension(400, 300));
+        // 设置 preferredSize
+        frame.setPreferredSize(new Dimension(800, 600));
+        // 居中
+        frame.setLocationRelativeTo(null);
+        // 显示
+        frame.setVisible(false);
+    }
+
+    public void drawGraph() {
+        final FilterConfig filterConfig = SettingsFilterService.getSettingsStorage(project);
+        boolean showCallTree = filterConfig.isShowCallTree();
+        if (!showCallTree || callerNode == null || CollectionUtils.isEmpty(callerNode.getNextNodes())) {
+            clearFrameContent(frame);
+            frame.setVisible(false);
+            return;
+        }
+
+        mxGraph graph = new mxGraph();
+        Object rootNode = graph.getDefaultParent();
+
+        graph.getModel().beginUpdate();
+        try {
+            int x = 20;
+            int y = 20;
+            List<MxCell> allCells = new ArrayList<>();
+
+            List<UsageCallerNode> nodes = callerNode.getNextNodes();
+            MxCell mxCell = new MxCell(element);
+            allCells.add(mxCell);
+
+
+            mxCell start = (mxCell) graph.insertVertex(rootNode, element.getText(), mxCell, x, y, width, height);
+            for (UsageCallerNode node : nodes) {
+                drawNode(filterConfig, allCells, graph, rootNode, start, node, x, y);
+                y += yMove;
+            }
+        } finally {
+            graph.getModel().endUpdate();
+        }
+
+        // 禁止拖动边
+        graph.setAllowDanglingEdges(false);
+        graph.setCellsEditable(false);
+        graph.setCellsMovable(true);
+        graph.setCellsResizable(true);
+        graph.setCellsDisconnectable(false);
+        graph.setCellsCloneable(false);
+        graph.setKeepEdgesInBackground(true);
+        graph.setConnectableEdges(false);
+        graph.setCellsMovable(true);
+
+
+        mxGraphComponent graphComponent = new mxGraphComponent(graph);
+        graphComponent.setAutoScroll(true);
+        graphComponent.setConnectable(false);
+        graphComponent.setAutoScroll(true);
+        // 在组件上设置拖动操作
+        graphComponent.getGraphControl().setTransferHandler(new mxGraphTransferHandler());
+        // 添加双击事件
+        graphComponent.getGraphControl().addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() != 2) {
+                    return;
+                }
+                mxCell cell = (mxCell) graph.getSelectionCell();
+                if (cell == null) {
+                    return;
+                }
+                if (cell.getValue() instanceof MxCell mxCell) {
+                    PsiElement element = mxCell.getElement();
+                    if (element != null) {
+                        navigateToElement(element);
+                    }
+                }
+            }
+        });
+        clearFrameContent(frame);
+        frame.add(graphComponent);
+        // 自动调整大小
+        frame.pack();
+        frame.setVisible(true);
+    }
+
+    private static void clearFrameContent(JFrame frame) {
+        Component[] components = frame.getContentPane().getComponents();
+        for (Component component : components) {
+            frame.remove(component);
+        }
+        frame.revalidate();
+        frame.repaint();
+    }
+
+    private static void navigateToElement(PsiElement element) {
+        PsiFile containingFile = element.getContainingFile();
+        OpenFileDescriptor descriptor = new OpenFileDescriptor(element.getProject(), containingFile.getVirtualFile(), element.getTextOffset());
+        descriptor.navigate(true);
+    }
 
 }

@@ -1,8 +1,7 @@
-// 插件依赖
+// 声明项目所需的 Gradle 插件
 plugins {
     id 'java'
     id 'org.jetbrains.intellij' version '1.16.1'
-//    id 'org.jetbrains.kotlin.jvm' version '1.9.21'
 }
 
 // 项目信息
@@ -23,14 +22,16 @@ dependencies {
     compileOnly 'org.projectlombok:lombok:1.18.2'
     implementation 'org.apache.commons:commons-lang3:3.17.0'
     implementation 'org.javassist:javassist:3.30.2-GA'
+    implementation 'com.github.vlsi.mxgraph:jgraphx:4.2.2'
+
 }
 
-// sdk
+// intellij 的一些配置
 intellij {
     // 调试使用的版本
     version = '2023.1.5'
     type = 'IC' // IC 社区版 IU 企业版
-    // 插件依赖
+    // intellij  插件依赖
     plugins = ['com.intellij.java', 'com.intellij.java-i18n']
     // 不更新untilBuild
     updateSinceUntilBuild = false

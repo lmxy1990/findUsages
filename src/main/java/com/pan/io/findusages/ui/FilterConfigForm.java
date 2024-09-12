@@ -14,6 +14,9 @@ public class FilterConfigForm extends DialogWrapper {
     private JRadioButton RadioButton;
     private JRadioButton radioButton2;
     private JPanel mainPanel;
+    private JRadioButton radioButton1;
+    private JRadioButton rb22;
+    private ButtonGroup buttonGroup2;
     private ButtonGroup buttonGroup1;
     private final Project project;
 
@@ -33,6 +36,12 @@ public class FilterConfigForm extends DialogWrapper {
             radioButton2.setSelected(true);
         } else {
             RadioButton.setSelected(true);
+        }
+
+        if (filterConfig.isShowCallTree()) {
+            radioButton1.setSelected(true);
+        } else {
+            rb22.setSelected(true);
         }
 
     }
@@ -55,6 +64,8 @@ public class FilterConfigForm extends DialogWrapper {
             filterConfig.setFilterAnnotation(textField1.getText());
         }
         filterConfig.setOnlyCaller(radioButton2.isSelected());
+        filterConfig.setShowCallTree(radioButton1.isSelected());
         super.doOKAction();
     }
+
 }

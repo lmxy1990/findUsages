@@ -56,4 +56,14 @@ public class UsageCall {
     public int hashCode() {
         return new HashCodeBuilder(17, 37).append(called).append(caller).append(callMethod).toHashCode();
     }
+
+
+    @Override
+    public String toString() {
+        return caller.getText();
+    }
+
+    public PsiElement getCallMethod() {
+        return callMethod;
+    }
 }

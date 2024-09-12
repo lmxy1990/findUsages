@@ -6,7 +6,16 @@ public class FilterConfig {
     public String filterAnnotation;
     // 是否只过滤调用方法，false 过滤整条调用连
     public boolean onlyCaller;
+    public boolean showCallTree;
 
+
+    public boolean isShowCallTree() {
+        return showCallTree;
+    }
+
+    public void setShowCallTree(boolean showCallTree) {
+        this.showCallTree = showCallTree;
+    }
 
     public String getFilterAnnotation() {
         return filterAnnotation;
@@ -29,6 +38,7 @@ public class FilterConfig {
         FilterConfig storage = new FilterConfig();
         storage.filterAnnotation = "Transactional";
         storage.onlyCaller = false;
+        storage.showCallTree = true;
         return storage;
     }
 
