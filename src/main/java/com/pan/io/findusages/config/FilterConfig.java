@@ -7,6 +7,7 @@ public class FilterConfig {
     // 是否只过滤调用方法，false 过滤整条调用连
     public boolean onlyCaller;
     public boolean showCallTree;
+    public boolean showCallLink;
 
 
     public boolean isShowCallTree() {
@@ -39,7 +40,15 @@ public class FilterConfig {
         storage.filterAnnotation = "Transactional";
         storage.onlyCaller = false;
         storage.showCallTree = true;
+        storage.showCallLink = false;
         return storage;
     }
 
+    public boolean isShowCallLink() {
+        return showCallLink;
+    }
+
+    public void setShowCallLink(boolean showCallLink) {
+        this.showCallLink = showCallLink;
+    }
 }

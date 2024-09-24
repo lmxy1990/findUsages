@@ -4,15 +4,15 @@
     <id>com.pan.io.find-usages</id>
 
     <!--   插件名-->
-    <name>Find-Usages</name>
+    <name>Filter-Find-Usages</name>
 
     <!--   作者个人信息-->
-    <vendor email="lmxy1990@foxmail.com" url="https://lmxy1990.github.io/">个人开发者</vendor>
+    <vendor email="lmxy1990@foxmail.com" url="https://lmxy1990.github.io/">xinyi.pan</vendor>
 
     <!--    插件描述-->
     <description><![CDATA[
       <p>
-       插件功能：查找文件引用，支持文件、文件夹、文件类型、文件后缀、文件名、文件路径、文件内容、文件行、文件行内容、文件行正则、文件行行号、文件行行号
+       方法调用的链路查看，显示整颗调用树。可以自定义需要过滤的注解来使用，可以显示调用树图，调用方法引用列表等等
       </p>
   ]]></description>
 
@@ -33,6 +33,8 @@
         <!--设置 配置页面-->
         <!--        <applicationConfigurable dynamic="true" instance="com.pan.io.findusages.ui.FilterConfigForm"-->
         <!--                                 displayName="FilterFind"/>-->
+        <toolWindow id="FilterCallTree" factoryClass="com.pan.io.findusages.ui.CallTreeView" anchor="right"
+                    canCloseContents="true" doNotActivateOnStart="false"/>
     </extensions>
 
 

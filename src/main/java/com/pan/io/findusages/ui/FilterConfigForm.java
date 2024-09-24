@@ -16,6 +16,7 @@ public class FilterConfigForm extends DialogWrapper {
     private JPanel mainPanel;
     private JRadioButton radioButton1;
     private JRadioButton rb22;
+    private JCheckBox callView;
     private ButtonGroup buttonGroup2;
     private ButtonGroup buttonGroup1;
     private final Project project;
@@ -44,6 +45,12 @@ public class FilterConfigForm extends DialogWrapper {
             rb22.setSelected(true);
         }
 
+        if (filterConfig.isShowCallLink()) {
+            callView.setSelected(true);
+        } else {
+            callView.setSelected(false);
+        }
+
     }
 
     FilterConfig getSettingsStorage() {
@@ -65,6 +72,7 @@ public class FilterConfigForm extends DialogWrapper {
         }
         filterConfig.setOnlyCaller(radioButton2.isSelected());
         filterConfig.setShowCallTree(radioButton1.isSelected());
+        filterConfig.setShowCallLink(callView.isSelected());
         super.doOKAction();
     }
 
