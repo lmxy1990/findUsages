@@ -24,11 +24,6 @@ repositories {
 dependencies {
     implementation 'org.apache.commons:commons-lang3:3.17.0'
     implementation 'com.github.vlsi.mxgraph:jgraphx:4.2.3'
-// https://mvnrepository.com/artifact/com.alibaba.fastjson2/fastjson2
-//    implementation 'com.alibaba.fastjson2:fastjson2:2.0.53'
-// https://mvnrepository.com/artifact/com.alibaba/fastjson
-    implementation 'com.alibaba:fastjson:2.0.53'
-
 }
 
 // intellij 的一些配置

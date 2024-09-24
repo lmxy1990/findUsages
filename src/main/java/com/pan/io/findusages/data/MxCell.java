@@ -52,20 +52,23 @@ public class MxCell implements Serializable {
         return text;
     }
 
+    static final float per = 0.5f;
+    static final float per2 = 0.2f;
 
     public static int modifyWidth(String parent, String current, int defaultWidth) {
         if (parent == null && current == null) {
             return defaultWidth;
         }
+
         if (parent != null && current != null) {
-            return Math.max(defaultWidth, (parent.length() * 2 + current.length() * 2));
+            return Math.max(defaultWidth, (int) (parent.length() * per2 + current.length() * per2));
         }
         int width = defaultWidth;
         if (parent != null) {
-            width = Math.max(width, parent.length() * 2);
+            width = (int) Math.max(width, parent.length() * per);
         }
         if (current != null) {
-            width = Math.max(width, current.length() * 2);
+            width = (int) Math.max(width, current.length() * per);
         }
         return width;
     }
